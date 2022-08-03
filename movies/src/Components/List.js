@@ -1,15 +1,20 @@
 import React, { Component } from 'react'
-import { movies } from './GetMovies'
+// import { movies } from './GetMovies'
+import axios from 'axios'
 export default class List extends Component {
     constructor(){
         super();
         this.state={
-            hover:""
+            hover:"",
+            parr:[1],
+            currPage:7,
+            movies:[],
         };
     }
     handleEnter=(id)=>{
         this.setState({
           hover:id,
+          
         });
     };
     handleLeave=()=>{
@@ -18,12 +23,21 @@ export default class List extends Component {
         });
     };
 
-    render() {
-        let movie = movies.results;
+    async componentDidMount (){
+        let res=await axios.get(`https://api.themoviedb.org/3/movie/popular?api_key=1749ee86927c862e6ac40360e3eb8c0d&language=en-US&page=${this.state.currPage}`);
+        // console.log(res.data);
+        this.setState({
+            movies:[...res.data.results] 
+        })
+    }
+
+    render() {  
+        // console.log("render is called ")
+        // let movie = movies.results;
         return (
             <>
                 {
-                    movie.length === 0 ?
+                    this.state.movies.length === 0 ?
                         <div className="spinner-border text-secondary" role="status">
                             <span className="visually-hidden">Loading...</span>
                         </div> :
@@ -33,7 +47,7 @@ export default class List extends Component {
                                 <div>
                                     <div className='movies-list'>
                                     {
-                                        movie.map((movieObj) => (
+                                        this.state.movies.map((movieObj) => (
                                             <div>
                                                 <div className="card movie-card" onMouseEnter={()=>this.handleEnter(movieObj.id)} onMouseLeave={this.handleLeave}>
                                                     <img src={`https://image.tmdb.org/t/p/original${movieObj.backdrop_path}`} className="card-img-top Movie-img " alt="..." style={{ width: "20vw", heigth: "40vh" }} />
@@ -53,8 +67,22 @@ export default class List extends Component {
                                     </div>
                                 </div>
 
+                                <div className='pegination'>
+                                    
+                                    <nav aria-label="Page navigation example">
+                                    <ul class="pagination">
+                                        <li class="page-item"><a class="page-link" href="#">Previous</a></li>
+                                        {
+                                        this.state.parr.map(pageNum =>(
+                                        <li class="page-item"><a class="page-link" href="#">{pageNum}</a></li>
 
+                                        ))
+                                        }
+                                        <li class="page-item"><a class="page-link" href="#">Next</a></li>
+                                    </ul>
+                                    </nav>
 
+                                </div>
                             </div>
 
                         )
