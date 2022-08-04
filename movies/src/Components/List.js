@@ -7,7 +7,7 @@ export default class List extends Component {
         this.state={
             hover:"",
             parr:[1],
-            currPage:7,
+            currPage:1,
             movies:[],
         };
     }
@@ -23,8 +23,42 @@ export default class List extends Component {
         });
     };
 
+    changeMovie =async () =>{
+        console.log(this.state.currPage);
+        console.log("movie changed");
+        let res=await axios.get(`https://api.themoviedb.org/3/movie/popular?api_key=32c3d6c3f2e25bdbb3a269c9e549ab51&language=en-US&page=${this.state.currPage}`);
+        // console.log(res.data);
+        this.setState({
+            movies:[...res.data.results] 
+        })
+    }
+
+    handlePrev =() =>{
+        if(this.state.currPage !=1){
+            this.setState({
+                currPage:this.state.currPage-1
+            },this.changeMovie);
+        }
+    }
+    handleNext = () =>{
+        let tempArr=[]
+        for(let i=1 ; i<=this.state.parr.length+1 ; i++){
+            tempArr.push(i)
+        }
+        this.setState({
+            parr:[...tempArr],
+            currPage:this.state.currPage+1
+        },this.changeMovie)
+       
+    }
+    handlepageNum =(pageNum) =>{
+        this.setState({
+            currPage:pageNum
+        },this.changeMovie)
+    }
+
     async componentDidMount (){
-        let res=await axios.get(`https://api.themoviedb.org/3/movie/popular?api_key=1749ee86927c862e6ac40360e3eb8c0d&language=en-US&page=${this.state.currPage}`);
+        let res=await axios.get(`https://api.themoviedb.org/3/movie/popular?api_key=32c3d6c3f2e25bdbb3a269c9e549ab51&language=en-US&page=${this.state.currPage}`);
         // console.log(res.data);
         this.setState({
             movies:[...res.data.results] 
@@ -71,14 +105,14 @@ export default class List extends Component {
                                     
                                     <nav aria-label="Page navigation example">
                                     <ul class="pagination">
-                                        <li class="page-item"><a class="page-link" href="#">Previous</a></li>
+                                        <li class="page-item"><a class="page-link" onClick={this.handlePrev}>Previous</a></li>
                                         {
                                         this.state.parr.map(pageNum =>(
-                                        <li class="page-item"><a class="page-link" href="#">{pageNum}</a></li>
+                                        <li class="page-item"><a class="page-link" onClick={()=>{this.handlepageNum(pageNum)}}>{pageNum}</a></li>
 
                                         ))
                                         }
-                                        <li class="page-item"><a class="page-link" href="#">Next</a></li>
+                                        <li class="page-item"><a class="page-link" onClick={this.handleNext}>Next</a></li>
                                     </ul>
                                     </nav>
 
