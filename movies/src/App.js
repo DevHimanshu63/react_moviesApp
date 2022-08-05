@@ -19,7 +19,7 @@ function App() {
     <Navbar/>
     {/* <Banner/> */}
     <Routes>
-      <Route path="/" element={<List />}/>
+      <Route path="/" element={<><Banner/><List/></>}/>
       <Route path="/fav" element={<Favourites />} />
     </Routes>
   </BrowserRouter>

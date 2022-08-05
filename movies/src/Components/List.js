@@ -9,6 +9,7 @@ export default class List extends Component {
             parr:[1],
             currPage:1,
             movies:[],
+            fm:[] //this will store the id for added favourite
         };
     }
     handleEnter=(id)=>{
@@ -57,6 +58,11 @@ export default class List extends Component {
         },this.changeMovie)
     }
 
+    handleFavourites=(movieObj) =>{
+        let localstorageMovie=localStorage.getItem("movies")
+        
+    }
+
     async componentDidMount (){
         let res=await axios.get(`https://api.themoviedb.org/3/movie/popular?api_key=32c3d6c3f2e25bdbb3a269c9e549ab51&language=en-US&page=${this.state.currPage}`);
         // console.log(res.data);
@@ -90,7 +96,7 @@ export default class List extends Component {
                                                         
                                                         <div className='button-wrapper'>
                                                             { this.state.hover === movieObj.id && (
-                                                            <a href="#" class="btn btn-danger movie-button">Add to Favourites</a>
+                                                            <a href="#" class="btn btn-danger movie-button" onClick={()=>this.handleFavourites(movieObj)}>Add to Favourites</a>
                                                             )}
                                                         </div>
                                                     
