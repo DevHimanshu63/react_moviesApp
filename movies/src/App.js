@@ -4,17 +4,25 @@ import Navbar from './Components/Navbar';
 import Banner from './Components/Banner';
 import List from './Components/List';
 import Favourites from './Favourites';
+import { BrowserRouter,Routes,Route } from 'react-router-dom';
 function App() {
   return (
-    <>
-      
-    
-    <Navbar />
-    {/* <Banner />
-  <List /> */}
-    <Favourites />
-   
-    </>
+
+  // without router using we render in this type
+            // // <>
+            // <Navbar/>
+            // <Banner/>
+            // </List/>
+            // <Favourites/>
+            // // </>
+    <BrowserRouter>
+    <Navbar/>
+    {/* <Banner/> */}
+    <Routes>
+      <Route path="/" element={<List />}/>
+      <Route path="/fav" element={<Favourites />} />
+    </Routes>
+  </BrowserRouter>
   );
 }
 
