@@ -10,9 +10,12 @@ export default class Favourites extends Component {
             currGenre:"All Genre",
         };
     }
+
+
     async componentDidMount (){
-        let ans=await axios.get(`https://api.themoviedb.org/3/movie/popular?api_key=32c3d6c3f2e25bdbb3a269c9e549ab51&language=en-US&page=${this.state.currPage}`);
+        // let ans=await axios.get(`https://api.themoviedb.org/3/movie/popular?api_key=32c3d6c3f2e25bdbb3a269c9e549ab51&language=en-US&page=${this.state.currPage}`);
         // console.log(res.data);
+        let results=JSON.parse(localStorage.getItem("movies"))
         let genreId = {
             28: "Action",
             12: "Adventure",
@@ -35,7 +38,7 @@ export default class Favourites extends Component {
             37: "Western",
           };
         let genreArr=[];
-        ans.data.results.map((movieObj)=>{
+        results.map((movieObj)=>{
          if(!genreArr.includes(genreId[movieObj.genre_ids[0]])){
             genreArr.push(genreId[movieObj.genre_ids[0]]);
          }   
@@ -43,12 +46,19 @@ export default class Favourites extends Component {
         genreArr.unshift("All Genre")
         // console.log(genreArr);
         this.setState({
-            movies:[...ans.data.results],
+            movies:[...results],
             genre:[...genreArr] ,
 
         })
     }
    
+
+    handleCurrGenre=(genre)=>{
+        this.setState({
+            currGenre:genre
+        });
+    }
+
     render() {
 
         let genreId = {
@@ -72,15 +82,25 @@ export default class Favourites extends Component {
             10752: "War",
             37: "Western",
           };
+        let filterdArr=[];
+        if(this.state.currGenre != "All Genre"){
+            filterdArr=this.state.movies.filter((movieObj)=>genreId[movieObj.genre_ids[0]]==this.state.currGenre)
+        }
+        else{
+        filterdArr=this.state.movies;  
+        }
+        
         return (
             <div className="row">
                 <div className='col-3' >
                     <ul class="list-group">
                         {this.state.genre.map((genre)=>(
+                
                             this.state.currGenre===genre ?
                         <li class="list-group-item active" aria-current="true">{genre}</li>
                         :
-                        <li class="list-group-item" aria-current="true">{genre}</li>
+                        <li class="list-group-item" aria-current="true" onClick={()=>this.handleCurrGenre(genre)}>{genre}</li>
+                        
                         ))}
                        
 
@@ -105,7 +125,7 @@ export default class Favourites extends Component {
                             </thead>
                             <tbody>
                                 {
-                                    this.state.movies.map((movieObj)=>(
+                                    filterdArr.map((movieObj)=>(
                                 <tr>
                                     <th scope="row"><img width="50px" src={`https://image.tmdb.org/t/p/original${movieObj.backdrop_path}`}/>{movieObj.original_title}</th>
                                     <td>{genreId[movieObj.genre_ids[0]]}</td>
