@@ -8,6 +8,9 @@ export default class Favourites extends Component {
             movies:[],
             genre:[],
             currGenre:"All Genre",
+            curText:"",
+            currpage:1,
+            limit:5,
         };
     }
 
@@ -59,6 +62,54 @@ export default class Favourites extends Component {
         });
     }
 
+    handleText=(e)=>{
+        this.setState({
+            curText:e.target.value
+        })
+    }
+
+    sortPopularityAsc =()=>{
+        let allMovies=this.state.movies;
+        allMovies.sort((a,b)=>{
+            return a.popularity-b.popularity;
+        })
+        this.setState({
+            movies:[...allMovies]
+        })
+    }
+    sortPopularityDesc=()=>{
+        let allMovies=this.state.movies;
+        allMovies.sort((a,b)=>{
+            return b.popularity-a.popularity;
+        })
+        this.setState({
+            movies:[...allMovies]
+    })
+    }
+    sortRatingAsc=()=>{
+        let allMovies=this.state.movies;
+        allMovies.sort((a,b)=>{
+            return b.vote_average-a.vote_average;
+        })
+        this.setState({
+            movies:[...allMovies]
+    })
+    }
+    sortRatingDesc=()=>{
+        let allMovies=this.state.movies;
+        allMovies.sort((a,b)=>{
+            return b.vote_average-a.vote_average;
+        })
+        this.setState({
+            movies:[...allMovies]
+    })
+    }
+    handlePageNum=(page)=>{
+        this.setState({
+            currpage:page,
+        })
+    }
+
     render() {
 
         let genreId = {
@@ -83,13 +134,28 @@ export default class Favourites extends Component {
             37: "Western",
           };
         let filterdArr=[];
-        if(this.state.currGenre != "All Genre"){
-            filterdArr=this.state.movies.filter((movieObj)=>genreId[movieObj.genre_ids[0]]==this.state.currGenre)
+        if(this.state.curText === ''){
+            filterdArr=this.state.movies;
         }
         else{
-        filterdArr=this.state.movies;  
+            filterdArr=this.state.movies.filter(movieObj => {
+                let movieName=movieObj.original_title.toLowerCase();
+               return  movieName.includes(this.state.curText)
+            })
         }
-        
+        if(this.state.currGenre !== "All Genre"){
+            filterdArr=filterdArr.filter((movieObj)=>genreId[movieObj.genre_ids[0]]===this.state.currGenre)
+        }
+      
+        let numOfPages=Math.ceil(filterdArr.length / this.state.limit);
+        let pageArr=[];
+        for(let i=1 ;i<=numOfPages ;i++){
+            pageArr.push(i);
+        }
+        let si=(this.state.currpage-1)*this.state.limit;
+        let li=si+this.state.limit-1;
+         filterdArr=filterdArr.slice(si,li+1);
+         
         return (
             <div className="row">
                 <div className='col-3' >
@@ -108,7 +174,7 @@ export default class Favourites extends Component {
                 </div>
                 <div className='col'>
                     <div className='row'>
-                    <input type="text" className='col' placeholder='search'></input>
+                    <input type="text" className='col' placeholder='search' value={this.state.curText} onChange={this.handleText}></input>
                     <input type="number" className='col' placeholder='5'></input>
                     </div>
                     
@@ -118,8 +184,8 @@ export default class Favourites extends Component {
                                 <tr>
                                     <th scope="col">Title</th>
                                     <th scope="col">Genre</th>
-                                    <th scope="col">Popularity</th>
-                                    <th scope="col">Rating</th>
+                                    <th scope="col"><i class="fa-solid fa-caret-up" onClick={this.sortPopularityAsc}/> Popularity <i class="fa-solid fa-caret-up" onClick={this.sortPopularityDesc}/></th>
+                                    <th scope="col"><i class="fa-solid fa-caret-up" onClick={this.sortRatingAsc}/> Rating <i class="fa-solid fa-caret-down"onClick={this.sortRatingDesc}/> </th>
                                     <th scope="col"></th>
                                 </tr>
                             </thead>
@@ -142,8 +208,24 @@ export default class Favourites extends Component {
                             </tbody>
                         </table>
                     </div>
+                    
+                </div>
+                <div style={{marginLeft:"50rem"}}>
+                <nav aria-label="Page navigation example">
+                    <ul class="pagination">
+                        {
+                            pageArr.map((page)=>(
+                                <li class="page-item"><a class="page-link" onClick={()=>this.handlePageNum(page)}>{page}</a></li>
+                                ))
+                            }
+                    </ul>
+                </nav>
                 </div>
             </div>
+
+            
+
         )
+
     }
 }
